@@ -1,0 +1,22 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Runs every 14 minutes — Render sleeps after 15 min of inactivity
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render backend
+        run: |
+          echo "Pinging backend at $(date)"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://linkedin-cold-dm-chrome-extension.onrender.com/)
+          echo "Response status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Warning: Backend returned status $STATUS"
+          else
+            echo "Backend is awake and healthy ✓"
+          fi
