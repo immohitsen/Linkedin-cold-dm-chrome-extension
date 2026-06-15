@@ -1,70 +1,192 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>LinkedIn DM Generator Settings</title>
+  <title>LinkedIn Cold DM Generator — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background-color: #f8f9fa;
-      padding: 20px;
-      max-width: 400px;
-      margin: 0 auto;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f9f9f9;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      -webkit-font-smoothing: antialiased;
     }
+
     .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-top: 0;
-      color: #0a66c2;
-    }
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    input[type="text"], input[type="password"] {
+      background: #fff;
+      border: 1px solid #ebebeb;
+      border-radius: 14px;
+      padding: 36px 32px;
+      max-width: 440px;
       width: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-bottom: 16px;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #0a66c2;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      background: #0a0a0a;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      margin-bottom: 20px;
     }
-    button:hover {
-      background-color: #004182;
+
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      margin-bottom: 6px;
     }
-    #status {
-      margin-top: 10px;
-      color: #28a745;
-      font-size: 14px;
+
+    .version {
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #f0f0f0;
+      margin: 20px 0;
+    }
+
+    .section-title {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .feature-list li span.icon {
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .how-it-works {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      background: #0a0a0a;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-text {
+      font-size: 12.5px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .step-text strong {
+      color: #111;
+      font-weight: 600;
+    }
+
+    .footer-note {
+      font-size: 11.5px;
+      color: #bbb;
+      text-align: center;
+      margin-top: 24px;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Settings</h2>
-    <label for="apiKey">Groq API Key</label>
-    <input type="password" id="apiKey" placeholder="gsk_...">
-    
-    <label for="modelSelect">Groq Model</label>
-    <input type="text" id="modelSelect" value="llama3-8b-8192">
-    
-    <button id="saveBtn">Save Settings</button>
-    <div id="status"></div>
+
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 8L13.5 11L17 11.5L14.5 14L15 17.5L12 16L9 17.5L9.5 14L7 11.5L10.5 11L12 8Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h1>LinkedIn Cold DM Generator</h1>
+    <p class="version">Version 1.1 &nbsp;·&nbsp; Powered by Groq &amp; Llama 3</p>
+
+    <div class="divider"></div>
+
+    <p class="section-title">Features</p>
+    <ul class="feature-list">
+      <li><span class="icon">⚡</span> AI-generated, personalized DMs in seconds</li>
+      <li><span class="icon">🎯</span> Scrapes LinkedIn profile data automatically</li>
+      <li><span class="icon">📄</span> Upload your resume for richer, context-aware messages</li>
+      <li><span class="icon">✍️</span> Choose tone, length, and reason for reaching out</li>
+      <li><span class="icon">📨</span> Injects DM directly into the LinkedIn message box</li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <p class="section-title">How It Works</p>
+    <div class="how-it-works">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Open a <strong>LinkedIn profile</strong> and click the message button.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Click the extension icon. Choose <strong>tone, length</strong>, and add context.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Hit <strong>Generate &amp; Send DM</strong> — the message is written for you instantly.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Review, edit if needed</strong>, and hit Send on LinkedIn.</div>
+      </div>
+    </div>
+
+    <p class="footer-note">No API key needed &nbsp;·&nbsp; Your data never stored</p>
+
   </div>
-  <script src="options.js"></script>
 </body>
 </html>

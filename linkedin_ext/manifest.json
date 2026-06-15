@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "LinkedIn Cold DM Generator",
     "version": "1.1",
-    "description": "Generate personalized cold DMs for LinkedIn leads using Groq AI.",
+    "description": "Generate highly personalized LinkedIn cold DMs in one click. Scrapes profile data, supports resume upload, and injects the AI-written message directly into the chat box.",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
@@ -23,6 +23,7 @@
     "action": {
         "default_popup": "popup.html"
     },
+    "options_page": "options.html",
     "content_scripts": [
         {
             "matches": [
