@@ -1,5 +1,9 @@
 import os
+import io
+import base64
 import requests
+import pdfplumber
+from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -37,6 +41,7 @@ class DMRequest(BaseModel):
     style: str
     context: str
     profileData: ProfileData
+    resumeBase64: Optional[str] = None
 
 @app.get("/")
 def read_root():
@@ -56,7 +61,24 @@ def generate_dm(data: DMRequest):
     elif data.length == "long":
         length_instruction = "Write more than 100 words."
 
+    # Parse resume PDF if provided
+    resume_context = ""
+    if data.resumeBase64:
+        try:
+            pdf_bytes = base64.b64decode(data.resumeBase64)
+            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                resume_text = "\n".join(
+                    page.extract_text() or "" for page in pdf.pages
+                ).strip()
+            # Cap at 3000 chars to stay within token budget
+            resume_context = resume_text[:3000]
+        except Exception:
+            resume_context = ""  # Silently skip if parsing fails
+
     system_prompt = "You are an expert sales and networking assistant. Your goal is to write highly effective, personalized cold LinkedIn Direct Messages. Do not include any placeholder text like [Your Name]. Output ONLY the final message content, ready to be sent. Never complain about missing information."
+
+    if resume_context:
+        system_prompt += f"\n\nThe sender's background (from their resume):\n{resume_context}"
 
     headline_text = f"Their headline is: {data.profileData.headline}." if data.profileData.headline else ""
     about_text = f"Their about section is: {data.profileData.about}." if data.profileData.about else ""

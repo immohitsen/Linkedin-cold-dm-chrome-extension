@@ -1,44 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn DM Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
     <div class="container">
-      <h2>LinkedIn DM Generator</h2>
-      
-      <div class="form-group">
-        <label for="length">Message Length</label>
-        <select id="length">
-          <option value="short">Short (< 50 words)</option>
-          <option value="medium">Medium (50-100 words)</option>
-          <option value="long">Long (> 100 words)</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label for="style">Tone / Style</label>
-        <select id="style">
-          <option value="professional">Professional</option>
-          <option value="casual">Casual / Friendly</option>
-          <option value="direct">Direct & Pitch</option>
-          <option value="enthusiastic">Enthusiastic</option>
-        </select>
+
+      <!-- Header -->
+      <header class="header">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 8L13.5 11L17 11.5L14.5 14L15 17.5L12 16L9 17.5L9.5 14L7 11.5L10.5 11L12 8Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <h1>DM Generator</h1>
+          <span class="badge">AI Powered</span>
+        </div>
+      </header>
+
+      <div class="divider"></div>
+
+      <!-- Form -->
+      <div class="form">
+
+        <!-- Length selector as pill tabs -->
+        <div class="field">
+          <label class="field-label">Message Length</label>
+          <div class="pill-group" id="lengthGroup">
+            <button class="pill active" data-value="short">Short</button>
+            <button class="pill" data-value="medium">Medium</button>
+            <button class="pill" data-value="long">Long</button>
+          </div>
+          <input type="hidden" id="length" value="short">
+        </div>
+
+        <!-- Tone selector as pill tabs -->
+        <div class="field">
+          <label class="field-label">Tone</label>
+          <div class="pill-group" id="styleGroup">
+            <button class="pill active" data-value="professional">Professional</button>
+            <button class="pill" data-value="casual">Casual</button>
+            <button class="pill" data-value="direct">Direct</button>
+            <button class="pill" data-value="enthusiastic">Enthusiastic</button>
+          </div>
+          <input type="hidden" id="style" value="professional">
+        </div>
+
+        <!-- Context -->
+        <div class="field">
+          <label class="field-label" for="context">Why are you reaching out?</label>
+
+          <!-- Suggestion Chips -->
+        <div class="suggestions" id="suggestions">
+          <!-- Job & Internship Focused -->
+          <button class="chip" data-text="I'm currently exploring new opportunities and would love to connect and learn from your journey in the industry.">Exploring opportunities</button>
+          <button class="chip" data-text="I'm looking to break into the field and would love to connect. I'd greatly appreciate any advice you have for someone seeking an internship.">Internship advice</button>
+          <button class="chip" data-text="I noticed your team is hiring and I recently applied for a role. I'd love to connect and learn more about the team culture.">Applied for a role</button>
+          <button class="chip" data-text="I've been following your career path and would love a brief informational chat to learn more about your experience at your current company.">Coffee chat</button>
+          
+          <!-- General Networking & Other -->
+          <button class="chip" data-text="I saw your recent post and found your insights really valuable. I'd love to add you to my network.">Loved your post</button>
+          <button class="chip" data-text="I see we share similar professional interests. I'm looking to grow my network with like-minded professionals and would love to connect.">Mutual interests</button>
+        </div>
+
+          <textarea
+            id="context"
+            placeholder="e.g. Saw their post on AI trends, want to discuss a collaboration..."
+            rows="3"
+          ></textarea>
+          <span class="char-count" id="charCount">0 / 300</span>
+        </div>
+
+        <!-- Resume Upload -->
+        <div class="field">
+          <label class="field-label">Your Resume <span class="label-optional">(optional · adds context)</span></label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="resumeInput" accept=".pdf" hidden>
+            <!-- Empty state -->
+            <div class="upload-empty" id="uploadEmpty">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Upload PDF resume</span>
+            </div>
+            <!-- Uploaded state -->
+            <div class="upload-filled" id="uploadFilled" hidden>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span id="resumeFileName" class="resume-name"></span>
+              <button class="remove-resume" id="removeResume" title="Remove resume">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button id="generateBtn" class="btn-primary">
+          <span class="btn-text">Generate &amp; Send DM</span>
+          <span class="btn-loader" hidden>
+            <svg class="spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="31.4" stroke-dashoffset="10"/>
+            </svg>
+            Generating...
+          </span>
+        </button>
+
+        <!-- Status Toast -->
+        <div id="status" class="status" aria-live="polite"></div>
+
       </div>
 
-      <div class="form-group">
-        <label for="context">Context / Why reaching out?</label>
-        <textarea id="context" placeholder="e.g., Saw their post on AI, hiring for a Frontend Dev..." rows="3"></textarea>
-      </div>
-      
-      <button id="generateBtn">Generate & Send DM</button>
-      
-      <div id="status" class="status-message"></div>
-      
-      <div class="footer">
-        <!-- Settings link removed since key is hardcoded -->
-      </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <span>Powered by Groq &amp; Llama 3</span>
+      </footer>
+
     </div>
     <script src="popup.js"></script>
   </body>

@@ -1,8 +1,13 @@
 {
     "manifest_version": 3,
     "name": "LinkedIn Cold DM Generator",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Generate personalized cold DMs for LinkedIn leads using Groq AI.",
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
     "permissions": ["storage", "scripting", "activeTab"],
     "host_permissions": ["https://*.linkedin.com/*", "https://linkedin-cold-dm-chrome-extension.onrender.com/*"],
     "background": {

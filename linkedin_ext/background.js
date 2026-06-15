@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleGenerateDM(data, sendResponse) {
   try {
-    const { length, style, context, profileData } = data;
+    const { length, style, context, profileData, resumeBase64 } = data;
 
     // Replace the URL below with your actual Render deployment URL
     const BACKEND_URL = 'https://linkedin-cold-dm-chrome-extension.onrender.com';
@@ -24,7 +24,8 @@ async function handleGenerateDM(data, sendResponse) {
         length: length,
         style: style,
         context: context,
-        profileData: profileData
+        profileData: profileData,
+        resumeBase64: resumeBase64 || null
       })
     });
 

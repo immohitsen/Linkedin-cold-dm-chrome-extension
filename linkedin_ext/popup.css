@@ -1,93 +1,364 @@
-body {
-  width: 300px;
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
 }
 
+body {
+  width: 340px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #ffffff;
+  color: #0a0a0a;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =============================================
+   CONTAINER
+   ============================================= */
 .container {
-  padding: 16px;
+  padding: 20px;
 }
 
-h2 {
-  font-size: 16px;
-  margin-top: 0;
+/* =============================================
+   HEADER
+   ============================================= */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
-  color: #0a66c2; /* LinkedIn blue */
-  text-align: center;
 }
 
-.form-group {
-  margin-bottom: 12px;
+.logo {
+  width: 34px;
+  height: 34px;
+  background: #0a0a0a;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
 }
 
-label {
-  display: block;
-  font-size: 12px;
+.header-text {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.header-text h1 {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0a0a0a;
+  letter-spacing: -0.4px;
+}
+
+.badge {
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 4px;
+  color: #6b6b6b;
+  background: #f3f3f3;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
 }
 
-select, textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 13px;
+.divider {
+  height: 1px;
+  background: #ebebeb;
+  margin-bottom: 18px;
 }
 
-textarea {
-  resize: vertical;
+/* =============================================
+   FORM
+   ============================================= */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #0a66c2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: bold;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #8a8a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* =============================================
+   PILL GROUP
+   ============================================= */
+.pill-group {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e5e5;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b6b6b;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 8px;
+  font-family: inherit;
+  transition: all 0.12s ease;
+  white-space: nowrap;
 }
 
-button:hover {
-  background-color: #004182;
+.pill:hover {
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+  background: #f8f8f8;
 }
 
-button:disabled {
-  background-color: #a0b4c7;
+.pill.active {
+  border-color: #0a0a0a;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* =============================================
+   SUGGESTION CHIPS
+   ============================================= */
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e5e5;
+  background: #ffffff;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #6b6b6b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.chip:hover {
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+  background: #f5f5f5;
+}
+
+.chip.selected {
+  border-color: #0a0a0a;
+  background: #f5f5f5;
+  color: #0a0a0a;
+  font-weight: 600;
+}
+
+/* =============================================
+   TEXTAREA
+   ============================================= */
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: #0a0a0a;
+  resize: none;
+  line-height: 1.55;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  outline: none;
+  background: #fafafa;
+}
+
+textarea:focus {
+  border-color: #0a0a0a;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.06);
+}
+
+textarea::placeholder {
+  color: #b5b5b5;
+}
+
+.char-count {
+  font-size: 10.5px;
+  color: #c0c0c0;
+  text-align: right;
+  margin-top: -2px;
+}
+
+/* =============================================
+   RESUME UPLOAD
+   ============================================= */
+.label-optional {
+  font-size: 9.5px;
+  font-weight: 400;
+  color: #b0b0b0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.upload-zone {
+  border: 1.5px dashed #d4d4d4;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+  background: #fafafa;
+}
+
+.upload-zone:hover {
+  border-color: #0a0a0a;
+  background: #f5f5f5;
+}
+
+.upload-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.upload-filled {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #0a0a0a;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.resume-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: #3a3a3a;
+}
+
+.remove-resume {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.12s ease, background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.remove-resume:hover {
+  color: #0a0a0a;
+  background: #ebebeb;
+}
+
+/* =============================================
+   BUTTON
+   ============================================= */
+.btn-primary {
+  width: 100%;
+  padding: 11px 16px;
+  background: #0a0a0a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: -0.1px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2a2a2a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+  background: #0a0a0a;
+}
+
+.btn-primary:disabled {
+  background: #c8c8c8;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.status-message {
-  margin-top: 10px;
+/* Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =============================================
+   STATUS
+   ============================================= */
+.status {
   font-size: 12px;
   text-align: center;
-  min-height: 15px;
+  min-height: 16px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
-.success { color: #28a745; }
-.error { color: #dc3545; }
+.status.success {
+  color: #1a1a1a;
+  background: #f3f3f3;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+}
 
+.status.error {
+  color: #1a1a1a;
+  background: #fff5f5;
+  padding: 8px 12px;
+  border: 1px solid #f0d0d0;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
 .footer {
-  margin-top: 16px;
+  margin-top: 14px;
   text-align: center;
-  font-size: 12px;
-}
-
-.footer a {
-  color: #666;
-  text-decoration: none;
-}
-
-.footer a:hover {
-  text-decoration: underline;
+  font-size: 10px;
+  color: #d4d4d4;
+  letter-spacing: 0.2px;
 }
