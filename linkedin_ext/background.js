@@ -13,7 +13,7 @@ async function handleGenerateDM(data, sendResponse) {
     const { length, style, context, profileData } = data;
 
     // Replace the URL below with your actual Render deployment URL
-    const BACKEND_URL = 'https://YOUR-APP-NAME.onrender.com';
+    const BACKEND_URL = 'https://linkedin-cold-dm-chrome-extension.onrender.com';
 
     const response = await fetch(`${BACKEND_URL}/generate`, {
       method: 'POST',
