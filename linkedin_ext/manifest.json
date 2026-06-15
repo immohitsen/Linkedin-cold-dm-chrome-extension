@@ -8,8 +8,15 @@
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
     },
-    "permissions": ["storage", "scripting", "activeTab"],
-    "host_permissions": ["https://*.linkedin.com/*", "https://linkedin-cold-dm-chrome-extension.onrender.com/*"],
+    "permissions": [
+        "storage",
+        "scripting",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://*.linkedin.com/*",
+        "https://linkedin-cold-dm-chrome-extension.onrender.com/*"
+    ],
     "background": {
         "service_worker": "background.js"
     },
@@ -18,8 +25,12 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://*.linkedin.com/*"],
-            "js": ["content.js"]
+            "matches": [
+                "https://*.linkedin.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
         }
     ]
 }
