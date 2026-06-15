@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Cold DM Generator",
+    "version": "1.0",
+    "description": "Generate personalized cold DMs for LinkedIn leads using Groq AI.",
+    "permissions": ["storage", "scripting", "activeTab"],
+    "host_permissions": ["https://*.linkedin.com/*", "https://YOUR-APP-NAME.onrender.com/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://*.linkedin.com/*"],
+            "js": ["content.js"]
+        }
+    ]
+}
