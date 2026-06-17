@@ -1,3 +1,7 @@
+// Popup UI script for LinkedIn Cold DM extension
+// Handles pill selection, character count, suggestion chips, and DM generation.
+// The legacy resume‑upload feature has been removed.
+
 document.addEventListener('DOMContentLoaded', () => {
   const generateBtn = document.getElementById('generateBtn');
   const btnText = generateBtn.querySelector('.btn-text');
@@ -5,115 +9,84 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusDiv = document.getElementById('status');
   const contextArea = document.getElementById('context');
   const charCount = document.getElementById('charCount');
+  const copyBtn = document.getElementById('copyBtn');
+  const generatedDM = document.getElementById('generatedDM');
+  const outputContainer = document.getElementById('outputContainer');
 
-  // Resume elements
-  const uploadZone = document.getElementById('uploadZone');
-  const resumeInput = document.getElementById('resumeInput');
-  const uploadEmpty = document.getElementById('uploadEmpty');
-  const uploadFilled = document.getElementById('uploadFilled');
-  const resumeFileName = document.getElementById('resumeFileName');
-  const removeResume = document.getElementById('removeResume');
+  // Modern copy‑to‑clipboard logic with visual feedback
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      if (generatedDM && generatedDM.value) {
+        try {
+          await navigator.clipboard.writeText(generatedDM.value);
 
-  // In-memory store for this session
-  let resumeBase64 = null;
+          const copyIcon = copyBtn.querySelector('.copy-icon');
+          const checkIcon = copyBtn.querySelector('.check-icon');
+          const copyText = copyBtn.querySelector('.copy-text');
 
-  // --- Pill group logic ---
-  function setupPillGroup(groupId, hiddenInputId) {
-    const group = document.getElementById(groupId);
-    const hiddenInput = document.getElementById(hiddenInputId);
-    group.querySelectorAll('.pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        hiddenInput.value = pill.dataset.value;
-      });
+          // Transition to copied state
+          copyBtn.classList.add('copied');
+          if (copyIcon) copyIcon.style.display = 'none';
+          if (checkIcon) checkIcon.style.display = 'inline-block';
+          if (copyText) copyText.textContent = 'Copied!';
+
+          showStatus('DM copied to clipboard', 'success');
+
+          // Reset feedback after 2 seconds
+          setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            if (copyIcon) copyIcon.style.display = 'inline-block';
+            if (checkIcon) checkIcon.style.display = 'none';
+            if (copyText) copyText.textContent = 'Copy';
+          }, 2000);
+        } catch (err) {
+          showStatus('Failed to copy. Please select and copy manually.', 'error');
+        }
+      }
     });
   }
 
-  setupPillGroup('lengthGroup', 'length');
-  setupPillGroup('styleGroup', 'style');
-
-  // --- Character counter ---
-  contextArea.addEventListener('input', () => {
+  // Update character count
+  function updateCharCount() {
     const len = contextArea.value.length;
     charCount.textContent = `${len} / 300`;
-    if (len > 300) contextArea.value = contextArea.value.slice(0, 300);
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-  });
+  }
+  contextArea.addEventListener('input', updateCharCount);
+  updateCharCount();
 
-  // --- Suggestion chips ---
-  document.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-      contextArea.value = chip.dataset.text;
-      const len = contextArea.value.length;
-      charCount.textContent = `${len} / 300`;
-      contextArea.focus();
-      contextArea.setSelectionRange(len, len);
+  // Initialize pill groups (length and style)
+  function initPillGroup(groupId, hiddenInputId) {
+    const group = document.getElementById(groupId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    if (!group || !hiddenInput) return;
+    group.addEventListener('click', (e) => {
+      e.preventDefault();
+      const btn = e.target.closest('.pill');
+      if (!btn) return;
+      // Deactivate all
+      group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      // Activate selected
+      btn.classList.add('active');
+      hiddenInput.value = btn.dataset.value;
     });
-  });
+  }
+  initPillGroup('lengthGroup', 'length');
+  initPillGroup('styleGroup', 'style');
 
-  // --- Resume upload ---
-
-  // Restore saved resume from storage on popup open
-  chrome.storage.local.get(['resumeBase64', 'resumeFileName'], (result) => {
-    if (result.resumeBase64 && result.resumeFileName) {
-      resumeBase64 = result.resumeBase64;
-      showResumeFilled(result.resumeFileName);
-    }
-  });
-
-  // Click on upload zone triggers file picker
-  uploadZone.addEventListener('click', (e) => {
-    // Don't trigger if clicking the remove button
-    if (e.target.closest('#removeResume')) return;
-    resumeInput.click();
-  });
-
-  // File selected
-  resumeInput.addEventListener('change', () => {
-    const file = resumeInput.files[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      showStatus('Only PDF files are supported.', 'error');
-      return;
-    }
-
-    if (file.size > 3 * 1024 * 1024) { // 3MB limit
-      showStatus('Resume must be under 3MB.', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      // Strip the data URL prefix ("data:application/pdf;base64,") to get raw base64
-      const base64 = e.target.result.split(',')[1];
-      resumeBase64 = base64;
-
-      // Persist across popup sessions
-      chrome.storage.local.set({ resumeBase64: base64, resumeFileName: file.name });
-      showResumeFilled(file.name);
-      showStatus('');
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // Remove resume
-  removeResume.addEventListener('click', (e) => {
-    e.stopPropagation();
-    resumeBase64 = null;
-    resumeInput.value = '';
-    chrome.storage.local.remove(['resumeBase64', 'resumeFileName']);
-    uploadFilled.hidden = true;
-    uploadEmpty.hidden = false;
-  });
-
-  function showResumeFilled(name) {
-    resumeFileName.textContent = name;
-    uploadEmpty.hidden = true;
-    uploadFilled.hidden = false;
+  // Suggestion chips
+  const suggestions = document.getElementById('suggestions');
+  if (suggestions) {
+    suggestions.addEventListener('click', (e) => {
+      e.preventDefault();
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      const text = chip.dataset.text;
+      contextArea.value = text;
+      updateCharCount();
+      // Highlight selected chip
+      suggestions.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    });
   }
 
   // --- Generate button ---
@@ -128,9 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    setLoading(true);
-    showStatus('');
-
+      setLoading(true);
+      // Reset output area
+      if (outputContainer) {
+        outputContainer.style.display = 'none';
+      }
+      if (generatedDM) {
+        generatedDM.value = '';
+      }
+      showStatus('');
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -156,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.runtime.sendMessage(
           {
             action: 'generateDM',
-            data: { length, style, context, profileData, resumeBase64: resumeBase64 || null }
+            data: { length, style, context, profileData }
           },
           (apiResponse) => {
             if (!apiResponse || apiResponse.error) {
@@ -165,14 +144,28 @@ document.addEventListener('DOMContentLoaded', () => {
               return;
             }
 
-            chrome.tabs.sendMessage(tab.id, { action: 'injectDM', text: apiResponse.text }, (injectResp) => {
-              setLoading(false);
-              if (injectResp && injectResp.success) {
-                showStatus('✓ DM written to message box. Review and send!', 'success');
-              } else {
-                showStatus(injectResp?.error || 'Make sure the LinkedIn message box is open.', 'error');
-              }
-            });
+            let text = (apiResponse.text || '').trim();
+            // Remove any surrounding double quotes, single quotes, or curly quotes
+            if ((text.startsWith('"') && text.endsWith('"')) ||
+                (text.startsWith("'") && text.endsWith("'")) ||
+                (text.startsWith('“') && text.endsWith('”')) ||
+                (text.startsWith('‘') && text.endsWith('’'))) {
+              text = text.slice(1, -1).trim();
+            }
+
+            chrome.tabs.sendMessage(tab.id, { action: 'injectDM', text: text }, (injectResp) => {
+                setLoading(false);
+                 if (generatedDM) {
+                   generatedDM.value = text;
+                 }
+                 if (outputContainer) {
+                   outputContainer.style.display = 'block';
+                 }
+                 if (injectResp && injectResp.success) {
+                   showStatus('✓ DM written to message box. Review and send!', 'success');
+                 } else {
+                   showStatus(injectResp?.error || 'Make sure the LinkedIn message box is open.', 'error');
+                 }              });
           }
         );
       });

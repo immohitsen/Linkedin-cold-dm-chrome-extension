@@ -1,24 +1,47 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "scrapeProfile") {
+  if (request.action === 'scrapeProfile') {
     try {
-      // Profile page name OR Messaging page name
+      // 1. Prioritize profile page name
+      // 2. Active mini-chat overlay bubble
+      // 3. Active conversation thread in full messaging view
+      // 4. General fallbacks
       const nameEl = document.querySelector('h1.text-heading-xlarge') 
+                  || document.querySelector('.pv-text-details__left-panel h1')
+                  || document.querySelector('.pv-top-card-layout__title')
+                  || document.querySelector('main h1')
+                  || document.querySelector('.msg-overlay-conversation-bubble--is-focused .msg-entity-lockup__entity-title')
+                  || document.querySelector('.msg-overlay-conversation-bubble--open .msg-entity-lockup__entity-title')
+                  || document.querySelector('.msg-thread__link--active .msg-thread__name')
                   || document.querySelector('h2.msg-entity-lockup__entity-title')
                   || document.querySelector('.msg-thread__name');
-      const name = nameEl ? nameEl.textContent.trim() : "there";
       
-      // Profile page headline OR Messaging page headline
+      let name = 'there';
+      if (nameEl) {
+        let rawName = nameEl.textContent.trim();
+        // Strip out pronouns like (She/Her)
+        rawName = rawName.replace(/\s*\(.*\)/g, '');
+        // Strip connection degrees (e.g. • 2nd) and suffixes (e.g. , PhD)
+        rawName = rawName.split('•')[0].split(',')[0].trim();
+        if (rawName) {
+          name = rawName;
+        }
+      }
+      
+      // Profile page headline OR Active message lockup headline
       const headlineEl = document.querySelector('div.text-body-medium')
+                      || document.querySelector('.pv-text-details__left-panel .text-body-medium')
+                      || document.querySelector('.msg-overlay-conversation-bubble--is-focused .msg-entity-lockup__entity-info')
+                      || document.querySelector('.msg-overlay-conversation-bubble--open .msg-entity-lockup__entity-info')
                       || document.querySelector('.msg-entity-lockup__entity-info');
-      const headline = headlineEl ? headlineEl.textContent.trim() : "";
+      const headline = headlineEl ? headlineEl.textContent.trim() : '';
 
       // About section (usually only on profile page)
       const aboutEl = document.querySelector('div#about ~ div .visually-hidden') || document.querySelector('.display-flex.ph5.pv3 .visually-hidden');
-      const about = aboutEl ? aboutEl.textContent.trim() : "";
+      const about = aboutEl ? aboutEl.textContent.trim() : '';
 
       sendResponse({ name, headline, about });
     } catch (e) {
-      sendResponse({ error: "Failed to scrape profile: " + e.message });
+      sendResponse({ error: 'Failed to scrape profile: ' + e.message });
     }
     return true;
   }

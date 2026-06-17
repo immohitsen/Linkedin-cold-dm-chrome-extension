@@ -1,6 +1,11 @@
-// Background service worker — routes DM generation requests to the backend API
+// Background service worker for LinkedIn Cold DM extension
+// Receives generation requests, forwards them to the remote AI service, and returns the result.
 
-const BACKEND_URL = 'https://linkedin-cold-dm-chrome-extension.onrender.com';
+// Set to true for local testing, false for production deployment
+const DEV_MODE = false;
+const BACKEND_URL = DEV_MODE 
+  ? 'http://localhost:8000' 
+  : 'https://linkedin-cold-dm-chrome-extension.onrender.com';
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 5000;
 
@@ -12,14 +17,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 async function handleGenerateDM(data, sendResponse) {
-  const { length, style, context, profileData, resumeBase64 } = data;
+  // Extract relevant fields from the request (resume data removed)
+  const { length, style, context, profileData } = data;
 
   const body = JSON.stringify({
     length,
     style,
     context,
     profileData,
-    resumeBase64: resumeBase64 || null
   });
 
   // Retry loop — handles Render free-tier cold starts gracefully

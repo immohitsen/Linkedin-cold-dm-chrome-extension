@@ -1,9 +1,5 @@
 import os
-import io
-import base64
 import requests
-import pdfplumber
-from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -14,17 +10,13 @@ load_dotenv()
 
 app = FastAPI()
 
-# CORS setup is CRITICAL for Chrome Extensions to communicate with the server
-# Replace the placeholder below with your actual Chrome Extension ID after loading it in Chrome.
-# To find your Extension ID: go to chrome://extensions -> enable Developer Mode -> copy the ID shown.
-EXTENSION_ID = os.getenv("EXTENSION_ID", "YOUR_EXTENSION_ID_HERE")
-
+# Enable CORS for Chrome Extensions by allowing all origins (credentials disabled)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[f"chrome-extension://{EXTENSION_ID}"],
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -41,11 +33,9 @@ class DMRequest(BaseModel):
     style: str
     context: str
     profileData: ProfileData
-    resumeBase64: Optional[str] = None
 
 @app.get("/")
 def read_root():
-    # This endpoint is useful for the Cronjob to ping and keep the server awake!
     return {"status": "Server is awake and running!"}
 
 @app.post("/generate")
@@ -61,39 +51,42 @@ def generate_dm(data: DMRequest):
     elif data.length == "long":
         length_instruction = "Write more than 100 words."
 
-    # Parse resume PDF if provided
-    resume_context = ""
-    if data.resumeBase64:
-        try:
-            pdf_bytes = base64.b64decode(data.resumeBase64)
-            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-                resume_text = "\n".join(
-                    page.extract_text() or "" for page in pdf.pages
-                ).strip()
-            # Cap at 3000 chars to stay within token budget
-            resume_context = resume_text[:3000]
-        except Exception:
-            resume_context = ""  # Silently skip if parsing fails
+    # The System Prompt: Defines Persona, Constraints, and Structure
+    system_prompt = """You are an elite B2B copywriter specializing in highly personalized, conversational LinkedIn cold outreach.
+    Your objective is to write human-sounding, low-friction Direct Messages that start conversations, not aggressive sales pitches.
 
-    system_prompt = "You are an expert sales and networking assistant. Your goal is to write highly effective, personalized cold LinkedIn Direct Messages. Do not include any placeholder text like [Your Name]. Output ONLY the final message content, ready to be sent. Never complain about missing information."
+    STRICT CONSTRAINTS:
+    1. OUTPUT ONLY THE FINAL MESSAGE: No preamble, no postscript, no quotes around the text.
+    2. NO PLACEHOLDERS: Do not use brackets like [Name] or [Company]. Use the provided context. If data is missing, adapt smoothly.
+    3. NO FLUFF: Never use greetings like "I hope this finds you well," "Happy Friday," or "Hope you're having a good week." Start immediately.
+    4. TONE: Professional, concise, and highly conversational. Avoid marketing buzzwords (e.g., 'synergy', 'innovative', 'streamline').
 
-    if resume_context:
-        system_prompt += f"\n\nThe sender's background (from their resume):\n{resume_context}"
+    DM STRUCTURE:
+    - Pattern Interrupt (Hook): 1 brief sentence referencing their specific background (Headline/About).
+    - The Bridge: Why you are reaching out right now, tying their background to your context.
+    - Soft Ask (CTA): End with a single, low-friction, open-ended question. Never ask for a meeting or a call in the first message."""
 
-    headline_text = f"Their headline is: {data.profileData.headline}." if data.profileData.headline else ""
-    about_text = f"Their about section is: {data.profileData.about}." if data.profileData.about else ""
+    # Handle missing profile data gracefully
+    headline_text = data.profileData.headline if data.profileData.headline else "No headline provided."
+    about_text = data.profileData.about if data.profileData.about else "No about section provided."
 
+    # The User Prompt: Cleanly structures the incoming variables
     user_prompt = f"""
-      Write a LinkedIn DM to {data.profileData.name}.
-      {headline_text}
-      {about_text}
+        Draft a LinkedIn DM to {data.profileData.name} based on the following parameters:
 
-      Style/Tone: {data.style}
-      Length: {length_instruction}
-      Context/Why I am reaching out: {data.context}
+        <recipient_profile>
+        Headline: {headline_text}
+        About: {about_text}
+        </recipient_profile>
 
-      Just write the message now based on whatever context is provided.
-    """
+        <generation_parameters>
+        Intent/Context: {data.context}
+        Tone/Style: {data.style}
+        Length constraints: {length_instruction}
+        </generation_parameters>
+
+        Write the message now following all system constraints.
+        """
 
     headers = {
         "Content-Type": "application/json",
